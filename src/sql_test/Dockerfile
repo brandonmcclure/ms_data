@@ -1,0 +1,1 @@
+FROM docker.io/bmcclure89/ms_sql:main

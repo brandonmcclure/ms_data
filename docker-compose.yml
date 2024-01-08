@@ -1,0 +1,44 @@
+version: "3.5"
+services:
+  pwsh_etl: 
+    image: bmcclure89/ms_etl:latest
+    volumes:
+      - ms_etl_csv:/mnt/csv
+      - ms_etl_node_textdir:/mnt/prom
+    command: pwsh -F /src/Invoke-ETL.ps1 -promMetricPath /mnt/prom -tempDownloadLocation /mnt/csv
+    restart: always
+  ms_sql:
+    image: bmcclure89/ms_sql:latest
+    volumes:
+      - ms_sql:/var/opt/mssql
+    ports:
+      - 1433:1433
+  node_exporter:
+    image: bmcclure89/ms_node_exporter:latest
+    volumes:
+      - ms_etl_node_textdir:/mnt/prom
+    ports:
+      - 9100:9100
+  grafana:
+    depends_on:
+      - prometheus
+    image: bmcclure89/ms_grafana:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - ms_grafana_data:/var/lib/grafana
+      - ms_etl_csv:/mnt/etl_csv
+  prometheus:
+    depends_on:
+      - node_exporter
+    image: bmcclure89/ms_prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ms_prom_data:/data
+volumes:
+  ms_grafana_data:
+  ms_prom_data:
+  ms_etl_csv:
+  ms_etl_node_textdir:
+  ms_sql:
