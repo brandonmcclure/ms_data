@@ -13,7 +13,7 @@ TAG := :latest
 
 
 .PHONY: all clean test lint act
-all: test
+all: build
 # Act/github workflows
 ACT_ARTIFACT_PATH := /workspace/.act 
 act: 
@@ -60,10 +60,10 @@ diagram_run_server: diagram_build_plantuml
 	$(STRUCTURIZR_LITE_CMD)
 
 compose_up:
-	@docker-compose -f docker-compose.yaml up -d
+	@docker-compose -f docker-compose.yml up -d
 
 compose_down:
-	@docker compose -f Docker-compose.yaml down
+	@docker compose -f Docker-compose.yml down
 
 clean:
-	@docker-compose -f docker-compose.yaml down -v --remove-orphans
+	@docker-compose -f docker-compose.yml down -v --remove-orphans
