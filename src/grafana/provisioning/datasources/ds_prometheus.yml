@@ -8,4 +8,4 @@ datasources:
 - name: DS_PROMETHEUS
   type: prometheus
   access: proxy
-  url: http://ms_prometheus:9090
+  url: http://prometheus:9090
