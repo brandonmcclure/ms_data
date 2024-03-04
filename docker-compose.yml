@@ -7,22 +7,34 @@ services:
       - ms_etl_node_textdir:/mnt/prom
     command: pwsh -F /src/Invoke-ETL.ps1 -promMetricPath /mnt/prom -tempDownloadLocation /mnt/csv
     restart: always
+  pwsh_etl_persistblitz: 
+    image: bmcclure89/ms_etl_persistblitz:latest
+    env_file: .sql.env
+    volumes:
+      - ms_etl_node_textdir:/mnt/prom
+    command: pwsh -F /src/Invoke-PersistSQLBlitz.ps1 -promMetricPath /mnt/prom
+    restart: always
+
   ms_sql:
     image: bmcclure89/ms_sql:latest
     volumes:
       - ms_sql:/var/opt/mssql
+    env_file: .sql.env
+    restart: no
     ports:
       - 1433:1433
   node_exporter:
     image: bmcclure89/ms_node_exporter:latest
     volumes:
       - ms_etl_node_textdir:/mnt/prom
+    restart: always
     ports:
       - 9100:9100
   grafana:
     depends_on:
       - prometheus
     image: bmcclure89/ms_grafana:latest
+    restart: always
     ports:
       - 3000:3000
     volumes:
@@ -32,6 +44,7 @@ services:
     depends_on:
       - node_exporter
     image: bmcclure89/ms_prometheus:latest
+    restart: always
     ports:
       - 9090:9090
     volumes:
