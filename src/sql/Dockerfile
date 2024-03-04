@@ -30,6 +30,7 @@ USER 10001:0
 
 COPY --chown=10001:0 entrypoint.sh /usr/bin
 COPY --chown=10001:0 init.sh /usr/bin
+COPY --chown=10001:0 CreateDBs.sql /usr/bin
 
 ENV MSSQL_SA_PASSWORD=$CD_SA_PASSWORD
 ENV ACCEPT_EULA=TRUE

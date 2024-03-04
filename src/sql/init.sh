@@ -8,4 +8,6 @@ echo "Checking SQL Server"
 STATUS=$(/opt/mssql-tools/bin/sqlcmd -S localhost -V16 -U sa -P $MSSQL_SA_PASSWORD -d master -l 300 -Q "SET NOCOUNT ON; SELECT 1" -W -h-1 )
 done
  
-echo "SQL UP!"
+echo "SQL UP, creating databases!"
+
+/opt/mssql-tools/bin/sqlcmd -S localhost -V16 -U sa -P $MSSQL_SA_PASSWORD -l 300 -d master -i /usr/bin/CreateDBs.sql
