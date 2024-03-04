@@ -9,6 +9,7 @@ STRUCTURIZR_CLI_CMD := structurizr
 STRUCTURIZR_LITE_CMD := docker run -it --rm -p 8080:8080 -v $${PWD}:/usr/local/structurizr structurizr/lite
 REGISTRY_NAME := 
 REPOSITORY_NAME := bmcclure89/
+CS_SA_PASSWORD := We@kP@ssword
 TAG := :latest
 
 
@@ -29,7 +30,7 @@ getcommitid:
 getbranchname:
 	$(eval BRANCH_NAME = $(shell (git branch --show-current ) -replace '/','.'))
 
-build: getcommitid getbranchname build_prometheus build_nodeexporter build_grafana build_etl build_sql build_sql_test diagram_build_plantuml
+build: getcommitid getbranchname build_prometheus build_nodeexporter build_grafana build_etl build_etl_persistblitz build_sql build_sql_test diagram_build_plantuml
 build_prometheus:
 	$(eval IMAGE_NAME = ms_prometheus)
 	docker build -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME)$(TAG) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME):$(BRANCH_NAME) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME):$(BRANCH_NAME)_$(COMMITID) ./src/prometheus
@@ -42,6 +43,9 @@ build_grafana:
 build_etl:
 	$(eval IMAGE_NAME = ms_etl)
 	docker build -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME)$(TAG) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME):$(BRANCH_NAME) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME):$(BRANCH_NAME)_$(COMMITID) ./src/ETL
+build_etl_persistblitz:
+	$(eval IMAGE_NAME = ms_etl_persistblitz)
+	docker build --build-arg CD_SA_PASSWORD=$(CS_SA_PASSWORD) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME)$(TAG) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME):$(BRANCH_NAME) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME):$(BRANCH_NAME)_$(COMMITID) ./src/PersistSQLBlitz
 build_sql:
 	$(eval IMAGE_NAME = ms_sql)
 	docker build --build-arg CD_SA_PASSWORD=$(CS_SA_PASSWORD) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME)$(TAG) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME):$(BRANCH_NAME) -t $(REGISTRY_NAME)$(REPOSITORY_NAME)$(IMAGE_NAME):$(BRANCH_NAME)_$(COMMITID) ./src/sql
@@ -59,11 +63,13 @@ diagram_build_plantuml: diagram_build_dsl
 diagram_run_server: diagram_build_plantuml
 	$(STRUCTURIZR_LITE_CMD)
 
-compose_up:
+configure_env:
+	If (-not (Test-Path .sql.env)){"MSSQL_SA_PASSWORD=$(CS_SA_PASSWORD)" | Set-Content .sql.env}
+compose_up: configure_env
 	@docker-compose -f docker-compose.yml up -d
 
 compose_down:
-	@docker compose -f Docker-compose.yml down
+	@docker compose -f docker-compose.yml down
 
 clean:
 	@docker-compose -f docker-compose.yml down -v --remove-orphans
