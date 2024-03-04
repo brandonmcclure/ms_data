@@ -44,6 +44,10 @@ I include a [vs code devcontainer](./.devcontainer/devcontainer.json) specificat
 
 We trust in the CI. Refer to our [Continuous Integration](docs/%20Continuous%20Integration.md) documentation and [code](BuildTools) to understand more about how to build this project.
 
+#### SQL
+
+You will need a `.sql.env` file with the SA password. Using the default `make` target will create one with the default password. Read up on [sql more here](./docs/SQL.md)
+
 #### Documentation
 
 The documentation is UTF-8 markdown files and should be editable in any text editor. 
