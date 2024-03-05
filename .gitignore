@@ -1,3 +1,5 @@
 workspace.json
-bin/*
+bin/**/*.puml
 .structurizr/*
+*~
+*.env
