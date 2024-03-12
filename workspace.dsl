@@ -18,6 +18,19 @@ workspace {
 
         ss_dba_sql = softwareSystem "administrators SQL DB"{
         }
+        ss_observability = softwareSystem "Observability"{
+            o_grafana = container "Grafana"
+            o_prometheus = container "Prometheus"
+
+            o_prometheus -> o_grafana "provisioned data source"
+            o_nodeexporter = container "Node Exporter"
+            o_nodeexporter -> o_prometheus "Scrapes from every 15s"
+        }
+
+        p_DatabaseAdmin -> o_grafana "Supports"
+        p_DatabaseAdmin -> o_grafana "Uses"
+        p_DatabaseAdmin -> o_prometheus "Supports"
+        p_DatabaseAdmin -> o_nodeexporter "Supports"
 
         ss_datajobs = softwareSystem "Data Jobs"{
             dj_persistblitz = container "Persist Blitz SQL metrics"{
@@ -28,6 +41,8 @@ workspace {
                 persistblitz_sqlconnect -> persistblitz_sqlexec "next"
                 persistblitz_promlogger = component "Write Prometheus metrics to textfile"
                 persistblitz_sqlexec -> persistblitz_promlogger "next"
+
+                o_nodeexporter -> persistblitz_promlogger "reads from textfile"
             }
         }
         dj_persistblitz -> ss_dba_sql "Executes stored proc on every 5 minutes"
@@ -104,6 +119,15 @@ workspace {
             include *
             #autolayout
         }
+        systemContext ss_observability "observability" {
+            include *
+            #autolayout
+        }
+        container ss_observability "observability_container" {
+            include *
+            #autolayout
+        }
+        
               
         
     }
