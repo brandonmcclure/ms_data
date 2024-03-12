@@ -19,9 +19,59 @@
 	"editable": true,
 	"fiscalYearStartMonth": 0,
 	"graphTooltip": 0,
+	"id": 2,
 	"links": [],
 	"liveNow": false,
 	"panels": [
+	  {
+		"collapsed": false,
+		"gridPos": {
+		  "h": 1,
+		  "w": 24,
+		  "x": 0,
+		  "y": 0
+		},
+		"id": 4,
+		"panels": [],
+		"title": "Overview",
+		"type": "row"
+	  },
+	  {
+		"datasource": {
+		  "type": "prometheus",
+		  "uid": "PBFE396EC0B189D67"
+		},
+		"gridPos": {
+		  "h": 6,
+		  "w": 9,
+		  "x": 0,
+		  "y": 1
+		},
+		"id": 3,
+		"options": {
+		  "code": {
+			"language": "plaintext",
+			"showLineNumbers": false,
+			"showMiniMap": false
+		  },
+		  "content": "Use the `textfile scrape error` viz to understand if the jobs are producing metric textfiles properly. If this is red, then other metrics may be missing.\n\nUse the `Time since last Job Run` is popualted by each of our jobs. It shows us the how much time has passed since the last job completed.",
+		  "mode": "markdown"
+		},
+		"pluginVersion": "10.4.0",
+		"title": "Overview",
+		"type": "text"
+	  },
+	  {
+		"gridPos": {
+		  "h": 1,
+		  "w": 24,
+		  "x": 0,
+		  "y": 7
+		},
+		"id": 5,
+		"title": "Signals",
+		"type": "row"
+	  },
 	  {
 		"datasource": {
 		  "type": "prometheus",
@@ -55,7 +105,7 @@
 				"type": "linear"
 			  },
 			  "showPoints": "auto",
-			  "spanNulls": false,
+			  "spanNulls": true,
 			  "stacking": {
 				"group": "A",
 				"mode": "none"
@@ -78,8 +128,7 @@
 				}
 			  ]
 			},
-			"unit": "s",
-			"unitScale": true
+			"unit": "s"
 		  },
 		  "overrides": []
 		},
@@ -87,7 +136,7 @@
 		  "h": 8,
 		  "w": 12,
 		  "x": 0,
-		  "y": 0
+		  "y": 8
 		},
 		"id": 1,
 		"options": {
@@ -118,9 +167,87 @@
 		],
 		"title": "Time since last Job Run",
 		"type": "timeseries"
+	  },
+	  {
+		"datasource": {
+		  "type": "prometheus",
+		  "uid": "PBFE396EC0B189D67"
+		},
+		"description": "If red, this indicates that there are issues with the text file that the Node Exporter reads. You will need to review the logs of that service to understand why it failed",
+		"fieldConfig": {
+		  "defaults": {
+			"color": {
+			  "mode": "thresholds"
+			},
+			"custom": {
+			  "fillOpacity": 70,
+			  "hideFrom": {
+				"legend": false,
+				"tooltip": false,
+				"viz": false
+			  },
+			  "insertNulls": false,
+			  "lineWidth": 0,
+			  "spanNulls": false
+			},
+			"mappings": [],
+			"thresholds": {
+			  "mode": "absolute",
+			  "steps": [
+				{
+				  "color": "green",
+				  "value": null
+				},
+				{
+				  "color": "red",
+				  "value": 1
+				}
+			  ]
+			}
+		  },
+		  "overrides": []
+		},
+		"gridPos": {
+		  "h": 8,
+		  "w": 12,
+		  "x": 12,
+		  "y": 8
+		},
+		"id": 2,
+		"options": {
+		  "alignValue": "left",
+		  "legend": {
+			"displayMode": "list",
+			"placement": "bottom",
+			"showLegend": true
+		  },
+		  "mergeValues": true,
+		  "rowHeight": 0.9,
+		  "showValue": "auto",
+		  "tooltip": {
+			"mode": "single",
+			"sort": "none"
+		  }
+		},
+		"targets": [
+		  {
+			"datasource": {
+			  "type": "prometheus",
+			  "uid": "PBFE396EC0B189D67"
+			},
+			"editorMode": "code",
+			"expr": "node_textfile_scrape_error",
+			"instant": false,
+			"legendFormat": "{{instance}}",
+			"range": true,
+			"refId": "A"
+		  }
+		],
+		"title": "textfile scrape error",
+		"type": "state-timeline"
 	  }
 	],
-	"refresh": "",
+	"refresh": "30s",
 	"schemaVersion": 39,
 	"tags": [],
 	"templating": {
@@ -133,6 +260,7 @@
 	"timepicker": {},
 	"timezone": "",
 	"title": "System Overview",
-	"version": 0,
+	"uid": "c3e9520f-52dd-462f-9f98-3cdbb4baacfc",
+	"version": 1,
 	"weekStart": ""
   }
