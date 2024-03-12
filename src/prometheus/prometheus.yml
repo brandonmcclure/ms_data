@@ -16,7 +16,19 @@
     - job_name: prometheus
       static_configs: 
         - targets: 
-            - "prometheus:9090"    
+            - "prometheus:9090"
+    - job_name: sql_exporter
+      metrics_path: /metrics
+      scheme: http
+      scrape_interval: 15s
+      scrape_timeout: 10s
+      static_configs: 
+        - targets:
+            - sql_exporter:9399
+          labels:
+            environment: "dev"
+            application: "sql"
+            subapplication: "exporter"    
     - job_name: node_exporter
       metrics_path: /metrics
       scheme: http
