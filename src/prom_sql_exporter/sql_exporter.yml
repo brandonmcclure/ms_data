@@ -1,0 +1,19 @@
+# I used default values, and will comment where I differ from the source: 
+# https://github.com/burningalchemist/sql_exporter
+global:
+  scrape_timeout_offset: 500ms
+  min_interval: 15s
+  max_connections: 3
+  max_idle_connections: 3
+  max_connection_lifetime: 10m
+
+target:
+  # Target name (optional). Setting this field enables extra metrics e.g. `up` and `scrape_duration` with
+  # the `target` label that are always returned on a scrape.
+  name: "dba"
+  data_source_name: "sqlserver://sa:We%40kP%40ssword@ms_sql:1433"
+
+  collectors: ['dba']
+
+collector_files:
+  - "*.collector.yml"

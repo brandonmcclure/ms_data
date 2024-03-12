@@ -1,0 +1,88 @@
+collector_name: dba
+
+metrics:
+  - metric_name: mssql_blitz_WaitStats
+    type: gauge
+    help: "WaitStats as surfaced from the First Responder Blitz kit"
+    key_labels:
+      - wait_type
+      - WaitCategory
+    value_label: valueLabel
+    values:
+      - ElapsedSeconds
+      - wait_time_ms_delta
+      - waiting_tasks_count_delta
+      - wait_time_minutes_per_minute
+    query: |
+      SELECT [wait_type]
+          ,[WaitCategory]
+          ,[ElapsedSeconds]
+          ,[wait_time_ms_delta]
+          ,[wait_time_minutes_per_minute]
+          ,[waiting_tasks_count_delta]
+      FROM [dba].[dbo].[First_WaitStats_Deltas]
+      where JoinKey = (SELECT max(JoinKey)
+      FROM [dba].[dbo].[First])
+  - metric_name: mssql_blitz_WhoStats
+    type: gauge
+    help: "WhoStats as surfaced from the First Responder Blitz kit"
+    key_labels:
+      - database_name
+      - host_name
+      - login_name
+    value_label: valueLabel
+    values:
+      - avg_query_cost
+      - count_running_queries
+      - count_sleeping_queries
+      - count_total_queries
+      - max_tempdb_allocations_mb
+      - avg_target_memory
+      - max_target_memory
+      - min_target_memory
+      - avg_granted_memory
+      - max_granted_memory
+      - min_granted_memory
+    query: |
+      SELECT database_name,host_name,login_name
+      ,avg(query_cost) as [avg_query_cost]
+      ,count(case when status='running' then 1 else 0 end) as [count_running_queries]
+      ,count(case when status='sleeping' then 1 else 0 end) as [count_sleeping_queries]
+      ,count(1) as [count_total_queries]
+      ,max(tempdb_allocations_mb) as [max_tempdb_allocations_mb]
+      ,avg(target_memory_kb) as [avg_target_memory]
+      ,max(target_memory_kb) as [max_target_memory]
+      ,min(target_memory_kb) as [min_target_memory]
+      ,avg(granted_memory_kb) as [avg_granted_memory]
+      ,max(granted_memory_kb) as [max_granted_memory]
+      ,min(granted_memory_kb) as [min_granted_memory]
+        FROM [dba].[dbo].[Who_Deltas]
+        where JoinKey = (SELECT max(JoinKey)
+        FROM [dba].[dbo].[First])
+        group by database_name,host_name,login_name
+  - metric_name: mssql_blitz_FirstStats
+    type: gauge
+    help: "First stats as surfaced from the First Responder Blitz kit. These are core metrics for monitoring health"
+    value_label: valueLabel
+    values:
+      - CPU_Utilization
+      - Wait_Time_per_Core_per_Sec
+      - Batch_Requests_per_Sec
+    query: |
+      SELECT
+            [FindingsGroup]
+            ,[Finding]
+            ,[DetailsInt]
+      into #t
+      FROM [dba].[dbo].[First]
+      where JoinKey = (SELECT max(JoinKey)
+              FROM [dba].[dbo].[First])
+          and FindingsGroup = 'Server Info'
+
+      select cpuUt.[DetailsInt] as [CPU_Utilization]
+      ,waitTimePerCore.[DetailsInt] as [Wait_Time_per_Core_per_Sec]
+      ,batchRequest.[DetailsInt] as [Batch_Requests_per_Sec]
+      from #t cpuUt
+      INNER join #t waitTimePerCore on 1=1 and  waitTimePerCore.Finding = 'Wait Time per Core per Sec'
+      left join #t batchRequest on 1=1 and  batchRequest.Finding = 'Batch Requests per Sec'
+      where cpuUt.Finding = 'CPU Utilization'

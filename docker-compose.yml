@@ -30,6 +30,11 @@ services:
     restart: always
     ports:
       - 9100:9100
+  sql_exporter:
+    image: bmcclure89/sql_exporter:latest
+    restart: always
+    ports:
+      - 9399:9399
   grafana:
     depends_on:
       - prometheus
