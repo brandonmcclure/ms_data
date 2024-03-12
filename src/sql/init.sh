@@ -8,12 +8,12 @@ while [ "$STATUS" != 1 ]
 do
     STATUS=$(/opt/mssql-tools/bin/sqlcmd -S localhost -V16 -U sa -P $MSSQL_SA_PASSWORD -l 300 -d master -Q "SET NOCOUNT ON; SELECT 1" -W -h-1 )
     
-    if [[ failedCheckCount -eq 10 ]] ; then
-        echo 'Tried checking the DB for too long, aborting'
+    if [[ failedCheckCount -eq 12 ]] ; then
+        echo 'Database initialization took longer than 120 seconds, aborting'
         exit 1
     fi
-    failedCheckCount = $failedCheckCount+1
-    sleep 1s
+    failedCheckCount=$failedCheckCount+1
+    sleep 10s
 done
 
 STATUS=0
@@ -26,12 +26,11 @@ do
 
     echo "Checking dba database"
     STATUS=$(/opt/mssql-tools/bin/sqlcmd -S localhost -V16 -U sa -P $MSSQL_SA_PASSWORD -d dba -l 300 -Q "SET NOCOUNT ON; SELECT 1" -W -h-1 )
-    if [[ failedCheckCount -eq 10 ]] ; then
-        echo 'Tried creating the DB for too long, aborting'
+    if [[ failedCheckCount -eq 120 ]] ; then
+        echo '[admin] database creation took longer than 120 seconds, aborting'
         exit 1
     fi
-    failedCheckCount = $failedCheckCount+1
-    sleep 2s
+    failedCheckCount=$failedCheckCount+1
 done
 
 echo "DBS created, installing Ola Hallengren maintenance solution"
