@@ -26,7 +26,7 @@ $$ echo $VERSION_ID \
 RUN /bin/mkdir -p /var/opt/mssql/backup \
 && /bin/mkdir -p /var/opt/mssql/dbfiles
 
-RUN wget -P /usr/bin/ https://raw.githubusercontent.com/BrentOzarULTD/SQL-Server-First-Responder-Kit/cf35b974d1614049b86816da053bcda4f6d6ec82/Install-All-Scripts.sql
+RUN wget -P /usr/bin/ https://raw.githubusercontent.com/brandonmcclure/SQL-Server-First-Responder-Kit/abaea1c3479db6d899ade4ea5199e868d26a2208/Install-All-Scripts.sql
 RUN wget -P /usr/bin/ https://raw.githubusercontent.com/olahallengren/sql-server-maintenance-solution/499c42bec571f5e214a64c01a4cb5c012bf3a6e8/MaintenanceSolution.sql
 
 USER 10001:0
